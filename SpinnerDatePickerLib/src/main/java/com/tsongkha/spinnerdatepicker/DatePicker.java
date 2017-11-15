@@ -25,9 +25,6 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -88,6 +85,13 @@ public class DatePicker extends FrameLayout {
         void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth);
     }
 
+    public DatePicker(Context context) {
+        this(context, null, 0);
+    }
+
+    public DatePicker(Context context, AttributeSet attrs) {
+        this(context, null, 0);
+    }
     public DatePicker(Context context, ViewGroup root, int numberPickerStyle) {
         super(context, null, 0);
 
@@ -189,7 +193,10 @@ public class DatePicker extends FrameLayout {
         // We use numeric spinners for year and day, but textual months. Ask icu4c what
         // order the user's locale uses for that combination. http://b/7207103.
         String skeleton = mHasYear ? "yyyyMMMdd" : "MMMdd";
-        String pattern = DateFormat.getBestDateTimePattern(Locale.getDefault(), skeleton);
+        String pattern = skeleton;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            pattern = DateFormat.getBestDateTimePattern(Locale.getDefault(), skeleton);
+        }
         char[] order = ICU.getDateFormatOrder(pattern);
 
         /* Remove the 3 pickers from their parent and then add them back in the
